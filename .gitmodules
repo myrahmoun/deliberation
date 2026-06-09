@@ -1,0 +1,3 @@
+[submodule "embeddings-for-preferences"]
+	path = embeddings-for-preferences
+	url = https://github.com/cartgr/Embeddings-for-Preferences

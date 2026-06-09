@@ -3,10 +3,5 @@ torch>=2.0
 sentence-transformers>=3.0
 peft>=0.10
 safetensors>=0.4
-datasets>=2.16
 pandas>=2.0
-pydantic>=2.0
-requests>=2.28
 matplotlib>=3.7
-openai>=1.12
-voyageai
