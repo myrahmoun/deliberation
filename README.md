@@ -38,7 +38,7 @@ PRECOMPUTED_IDS        = "output/s/campus_protests_participant_ids.csv"
 Then run:
 
 ```bash
-python -m anticlustering.main
+python3 -m anticlustering.main
 ```
 
 Saves group assignments to `output/assignments.csv`.
@@ -46,7 +46,7 @@ Saves group assignments to `output/assignments.csv`.
 ### 3. Benchmark
 
 ```bash
-python -m anticlustering.benchmark
+python3 -m anticlustering.benchmark
 ```
 
 Runs on synthetic data across several sizes — should hit 10k participants in ≤30s.

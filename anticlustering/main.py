@@ -40,12 +40,12 @@ QUALITY_C = 0.0
 
 # Pre-computed embeddings (set both to skip re-embedding; leave None to re-embed)
 PRECOMPUTED_EMBEDDINGS = "output/campus_protests_embeddings.npy"            # e.g. "output/embeddings.npy"
-PRECOMPUTED_IDS        = "output/s/campus_protests_participant_ids.csv"     # e.g. "output/participant_ids.csv"
+PRECOMPUTED_IDS        = "output/campus_protests_participant_ids.csv"
 
-OUTPUT_PATH = "data/results/assignments.csv"         # where to save group assignments
+OUTPUT_PATH = "output/campus_protests_assignments.csv"
 
-VISUALIZE = True                                        # set False to skip plotting
-VISUALIZE_OUTPUT = "data/results/plot.png"       # path to save plot, or None to show interactively
+VISUALIZE = True                               # set False to skip plotting
+VISUALIZE_OUTPUT = "output/campus_protests_plot.png"  # set None to show interactively
 
 # ── RUN ───────────────────────────────────────────────────────────────────────
 
@@ -59,6 +59,13 @@ if __name__ == "__main__":
         )
     else:
         participant_ids, embeddings = embed_participants(DATA_PATH, MODEL_PATH, device=DEVICE)
+
+    # Trim to largest multiple of GROUP_SIZE (drops at most GROUP_SIZE-1 participants)
+    n_valid = (len(participant_ids) // GROUP_SIZE) * GROUP_SIZE
+    if n_valid < len(participant_ids):
+        print(f"Trimming {len(participant_ids) - n_valid} participants to fit group_size={GROUP_SIZE}")
+        participant_ids = participant_ids[:n_valid]
+        embeddings = embeddings[:n_valid]
 
     # Form anti-clustered groups
     assignments = form_groups(
@@ -79,6 +86,9 @@ if __name__ == "__main__":
         visualize(
             assignments=results,
             embeddings=embeddings,
+            a=QUALITY_A,
+            b=QUALITY_B,
+            c=QUALITY_C,
             output_path=VISUALIZE_OUTPUT,
             title=Path(DATA_PATH).stem.replace("_", " ").title(),
         )

@@ -169,15 +169,41 @@ def optimal_dispersion(a: float, b: float) -> float:
 
 # ── Visualize ─────────────────────────────────────────────────────────────────
 
-def plot_group_sizes(assignments: pd.DataFrame, ax) -> None:
-    import matplotlib.pyplot as plt
-    sizes = assignments["group"].value_counts().sort_index()
-    ax.bar(sizes.index, sizes.values, color="steelblue", edgecolor="white", linewidth=0.4)
-    ax.axhline(sizes.mean(), color="red", linestyle="--", linewidth=1.2, label=f"mean = {sizes.mean():.1f}")
-    ax.set_xlabel("Group")
-    ax.set_ylabel("Participants")
-    ax.set_title("Group sizes")
-    ax.legend()
+def plot_quality_fn(
+    embeddings: np.ndarray,
+    assignments: pd.DataFrame,
+    a: float,
+    b: float,
+    c: float,
+    ax,
+) -> None:
+    """Plot the quality parabola and mark where each group's dispersion falls."""
+    groups = sorted(assignments["group"].unique())
+    group_members = [np.where(assignments["group"].values == g)[0] for g in groups]
+    dispersions = all_group_dispersions(embeddings, group_members)
+
+    d_min = max(0, dispersions.min() * 0.6)
+    d_max = dispersions.max() * 1.4
+    d_curve = np.linspace(d_min, d_max, 300)
+    q_curve = a * d_curve**2 + b * d_curve + c
+
+    ax.plot(d_curve, q_curve, color="steelblue", linewidth=2, label="quality function")
+    ax.scatter(dispersions, a * dispersions**2 + b * dispersions + c,
+               color="steelblue", s=20, alpha=0.6, zorder=3)
+
+    d_opt = -b / (2 * a)
+    if d_min <= d_opt <= d_max:
+        ax.axvline(d_opt, color="green", linestyle="--", linewidth=1.2,
+                   label=f"optimal D = {d_opt:.3f}")
+
+    d_mean = dispersions.mean()
+    ax.axvline(d_mean, color="red", linestyle="--", linewidth=1.2,
+               label=f"mean D = {d_mean:.3f}")
+
+    ax.set_xlabel("Dispersion D(g)")
+    ax.set_ylabel("Quality")
+    ax.set_title(f"Quality function  (a={a}, b={b}, c={c})")
+    ax.legend(fontsize=8)
 
 
 def plot_dispersion_chart(embeddings: np.ndarray, assignments: pd.DataFrame, ax) -> None:
@@ -219,29 +245,19 @@ def plot_umap(embeddings: np.ndarray, assignments: pd.DataFrame, ax) -> None:
 
 def visualize(
     assignments: pd.DataFrame,
-    embeddings: np.ndarray | None = None,
+    embeddings: np.ndarray,
+    a: float = -1.0,
+    b: float = 2.0,
+    c: float = 0.0,
     output_path: str | Path | None = None,
     title: str = "Anti-clustering results",
 ) -> None:
-    """Plot group sizes, per-group dispersion, and UMAP projection.
+    """Plot quality function, per-group dispersion, and UMAP projection."""
+    fig, axes = plt.subplots(1, 3, figsize=(18, 4))
 
-    Args:
-        assignments: DataFrame with a 'group' column (and optionally 'Participant ID').
-        embeddings: (n, d) array. If None, only the group-size bar chart is shown.
-        output_path: Save figure to this path instead of displaying interactively.
-        title: Figure title.
-    """
-
-    has_embeddings = embeddings is not None
-    n_plots = 3 if has_embeddings else 1
-    fig, axes = plt.subplots(1, n_plots, figsize=(6 * n_plots, 4))
-    if n_plots == 1:
-        axes = [axes]
-
-    plot_group_sizes(assignments, axes[0])
-    if has_embeddings:
-        plot_dispersion_chart(embeddings, assignments, axes[1])
-        plot_umap(embeddings, assignments, axes[2])
+    plot_quality_fn(embeddings, assignments, a, b, c, axes[0])
+    plot_dispersion_chart(embeddings, assignments, axes[1])
+    plot_umap(embeddings, assignments, axes[2])
 
     fig.suptitle(title, fontsize=13, fontweight="bold")
     fig.tight_layout()
