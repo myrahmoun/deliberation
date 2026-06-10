@@ -40,10 +40,10 @@ QUALITY_B = 2.0
 QUALITY_C = 0.0
 
 # Pre-computed embeddings (set both to skip re-embedding; leave None to re-embed)
-PRECOMPUTED_EMBEDDINGS = "output/campus_protests_embeddings.npy"            # e.g. "output/embeddings.npy"
-PRECOMPUTED_IDS        = "output/campus_protests_participant_ids.csv"
+PRECOMPUTED_EMBEDDINGS = "output/right_to_assemble_embeddings.npy"            # e.g. "output/embeddings.npy"
+PRECOMPUTED_IDS        = "output/right_to_assemble_participant_ids.csv"
 
-OUTPUT_PATH = "output/campus_protests_assignments.csv"
+OUTPUT_PATH = "output/right_to_assemble_assignments.csv"
 
 VISUALIZE = False                                     # set False to skip plotting
 VISUALIZE_OUTPUT = "output/campus_protests_plot.png"  # set None to show interactively
