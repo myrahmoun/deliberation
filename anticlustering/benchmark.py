@@ -91,7 +91,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Benchmark anti-clustering on synthetic data")
     parser.add_argument("--sizes", nargs="+", type=int, default=DEFAULT_SIZES)
     parser.add_argument("--group-size", type=int, default=8)
-    parser.add_argument("--dim", type=int, default=384)
+    parser.add_argument("--dim", type=int, default=1024)
     parser.add_argument("--n-iter-per-point", type=int, default=50)
     parser.add_argument("--plot", type=str, default=None, help="Path to save scaling plot")
     args = parser.parse_args()

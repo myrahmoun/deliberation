@@ -46,7 +46,7 @@ PRECOMPUTED_IDS        = "output/right_to_assemble_participant_ids.csv"
 OUTPUT_PATH = "output/right_to_assemble_assignments.csv"
 
 VISUALIZE = False                                     # set False to skip plotting
-VISUALIZE_OUTPUT = "output/campus_protests_plot.png"  # set None to show interactively
+VISUALIZE_OUTPUT = "output/right_to_assemble_assignments.png"  # set None to show interactively
 
 # ── RUN ───────────────────────────────────────────────────────────────────────
 
