@@ -4,13 +4,8 @@ This document proves the correctness of `form_groups` in
 [`algorithm.py`](algorithm.py), together with the incremental update helpers in
 [`helpers.py`](helpers.py).
 
-We are precise about *what* is being claimed. The algorithm is a **greedy local
-search** (hill climbing) over a swap neighborhood. The theorem we prove is
-therefore not global optimality, but rather:
-
-> **Theorem.** At every iteration the algorithm maintains a valid partition into
-> equal-sized groups; its cached centroids and dispersions are always *exact*;
-> every accepted swap *strictly increases* the true objective; and the algorithm
+> At every iteration the algorithm maintains a valid partition into
+> equal-sized groups; every accepted swap *strictly increases* the true objective; and the algorithm
 > terminates. Hence it returns a valid partition whose objective is no worse than
 > the random initial partition, and which is a **local optimum with respect to the
 > single-pair swap neighborhood** once no improving swap remains.
@@ -131,19 +126,17 @@ preserved. $\qquad\blacksquare$
 ## 4. The acceptance test reflects the true objective
 
 **Lemma 4 (Correct $\Delta$).** Let $P$ be the current partition and $P'$ the
-partition after a candidate swap. Then `delta_q`
+partition after a candidate swap. Then $\Delta(Q)$
 ([`algorithm.py:84-87`](algorithm.py#L84-L87)) satisfies
 
 $$
-\texttt{delta\_q} = K\,\bigl(Q(P') - Q(P)\bigr).
+\Delta Q = K\,(Q(P') - Q(P)).
 $$
 
 *Proof.* Only groups $g_1, g_2$ change, so
 
 $$
-Q(P') - Q(P)
-= \frac{1}{K}\Bigl[\,q(D(G_{g_1}')) + q(D(G_{g_2}'))
-   - q(D(G_{g_1})) - q(D(G_{g_2}))\,\Bigr].
+Q(P') - Q(P) = \frac{1}{K}\bigl[q(D(G_{g_1}')) + q(D(G_{g_2}')) - q(D(G_{g_1})) - q(D(G_{g_2}))\bigr].
 $$
 
 By the cache-consistency corollary, `dispersions[g1]` $= D(G_{g_1})$ and
