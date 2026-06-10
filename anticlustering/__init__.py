@@ -1,4 +1,23 @@
 from .algorithm import form_groups
-from .quality import group_quality, total_quality, optimal_dispersion
+from .helpers import (
+    embed_participants,
+    load_participants,
+    load_precomputed_embeddings,
+    make_quality_fn,
+    group_quality,
+    total_quality,
+    optimal_dispersion,
+    visualize,
+)
 
-__all__ = ["form_groups", "group_quality", "total_quality", "optimal_dispersion"]
+__all__ = [
+    "form_groups",
+    "embed_participants",
+    "load_participants",
+    "load_precomputed_embeddings",
+    "make_quality_fn",
+    "group_quality",
+    "total_quality",
+    "optimal_dispersion",
+    "visualize",
+]

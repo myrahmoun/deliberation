@@ -1,23 +1,26 @@
 """Pairwise exchange algorithm for anti-clustering.
 
-Maximizes mean group quality (quadratic in dispersion) by iteratively
-proposing random swaps between groups and accepting those that improve total quality.
+Maximizes mean group quality by iteratively proposing random swaps between groups
+and accepting those that improve total quality.
+
+To swap the objective, pass a different `quality_fn` to `form_groups`.
+To swap the algorithm entirely, replace `form_groups` with any function sharing
+the same signature: (embeddings, group_size, quality_fn, ...) -> assignments.
 """
 
 from __future__ import annotations
 
+from typing import Callable
+
 import numpy as np
 
-from .dispersion import all_group_dispersions, updated_centroid, dispersion_after_swap
-from .quality import group_quality
+from .helpers import all_group_dispersions, updated_centroid, dispersion_after_swap, make_quality_fn
 
 
 def form_groups(
     embeddings: np.ndarray,
     group_size: int,
-    a: float = -1.0,
-    b: float = 2.0,
-    c: float = 0.0,
+    quality_fn: Callable[[float], float] | None = None,
     n_iter: int | None = None,
     random_seed: int | None = None,
 ) -> np.ndarray:
@@ -29,7 +32,9 @@ def form_groups(
     Args:
         embeddings: (n, d) float array of point embeddings.
         group_size: Each group will have exactly this many points. n must be divisible.
-        a, b, c: Quadratic quality parameters. a must be negative (inverted-U shape).
+        quality_fn: Maps dispersion (float) → quality score (float). Should be
+            maximized; defaults to the quadratic a=-1, b=2, c=0. Swap this to
+            change the objective without touching the algorithm.
         n_iter: Total swap proposals. Defaults to n * 50.
         random_seed: Seed for reproducibility.
 
@@ -39,8 +44,9 @@ def form_groups(
     n, _ = embeddings.shape
     if n % group_size != 0:
         raise ValueError(f"n={n} is not divisible by group_size={group_size}")
-    if a >= 0:
-        raise ValueError("a must be negative (inverted-U quality function)")
+
+    if quality_fn is None:
+        quality_fn = make_quality_fn(a=-1.0, b=2.0, c=0.0)
 
     rng = np.random.default_rng(random_seed)
     n_groups = n // group_size
@@ -76,8 +82,8 @@ def form_groups(
         new_d2 = dispersion_after_swap(embeddings[group_members[g2]], j, x, new_c2)
 
         delta_q = (
-            group_quality(new_d1, a, b, c) + group_quality(new_d2, a, b, c)
-            - group_quality(dispersions[g1], a, b, c) - group_quality(dispersions[g2], a, b, c)
+            quality_fn(new_d1) + quality_fn(new_d2)
+            - quality_fn(dispersions[g1]) - quality_fn(dispersions[g2])
         )
 
         if delta_q > 0:

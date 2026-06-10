@@ -6,8 +6,7 @@ import time
 import numpy as np
 
 from .algorithm import form_groups
-from .quality import total_quality, optimal_dispersion
-from .dispersion import all_group_dispersions
+from .helpers import make_quality_fn, total_quality, optimal_dispersion, all_group_dispersions
 
 
 DEFAULT_SIZES = [500, 1000, 2000, 5000, 10_000]
@@ -41,7 +40,7 @@ def run_benchmark(
         assignments = form_groups(
             embeddings,
             group_size=group_size,
-            a=a, b=b, c=c,
+            quality_fn=make_quality_fn(a, b, c),
             n_iter=n * n_iter_per_point,
             random_seed=random_seed,
         )

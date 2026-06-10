@@ -10,13 +10,69 @@ Group formation and recommendation tools for [Frankly](https://app.frankly.org),
 
 ## Quickstart
 
-```bash
-# benchmark anti-clustering on synthetic data (should hit 10k participants in ≤30s)
-python -m anticlustering.benchmark
+### 1. Embed participants (once per dataset)
 
-# run on real data
-python -m anticlustering.pipeline path/to/data.csv path/to/model
+Embedding is slow — run this once and reuse the output:
+
+```bash
+python -m anticlustering.embed data/remesh_export.csv path/to/model --output-dir output/
 ```
+
+Saves `output/embeddings.npy` and `output/participant_ids.csv`.
+
+### 2. Configure and run
+
+Edit the `CONFIG` block at the top of `anticlustering/main.py`:
+
+```python
+DATA_PATH    = "data/remesh_export.csv"
+MODEL_PATH   = "path/to/model"
+GROUP_SIZE   = 8
+VISUALIZE    = True   # set False to skip plots
+
+# Point to pre-computed embeddings to skip re-embedding:
+PRECOMPUTED_EMBEDDINGS = "output/campus_protests_embeddings.npy"
+PRECOMPUTED_IDS        = "output/s/campus_protests_participant_ids.csv"
+```
+
+Then run:
+
+```bash
+python -m anticlustering.main
+```
+
+Saves group assignments to `output/assignments.csv`.
+
+### 3. Benchmark
+
+```bash
+python -m anticlustering.benchmark
+```
+
+Runs on synthetic data across several sizes — should hit 10k participants in ≤30s.
+
+## File structure
+
+```
+anticlustering/
+  main.py       — config + orchestration (start here)
+  algorithm.py  — form_groups(): pairwise exchange anti-clustering
+  helpers.py    — utilities grouped by role: load data, embedding,
+                  dispersion, quality, visualize
+  embed.py      — one-time script to pre-compute and save embeddings
+  benchmark.py  — runtime scaling benchmark on synthetic data
+```
+
+## Swapping the algorithm or objective
+
+To change the **quality objective**, pass a different `quality_fn` in `main.py`:
+
+```python
+# e.g. maximize raw dispersion instead of quadratic
+form_groups(embeddings, group_size=8, quality_fn=lambda d: d)
+```
+
+To change the **algorithm** entirely, replace the `form_groups` call in `main.py` with any function that accepts `(embeddings, group_size, ...)` and returns an `(n,)` int array of group indices.
 
 ## Dependencies
 
