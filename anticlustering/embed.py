@@ -2,7 +2,7 @@
 
 Run once per dataset:
 
-    python -m anticlustering.embed data/topic_verbatim_map.csv path/to/model --output-dir output/
+    python -m anticlustering.embed data/anticlustering/topic_verbatim_map.csv --output-dir output/
 
 Produces (named after the CSV stem):
     output/topic_embeddings.npy      — (n, d) float32 participant embeddings
@@ -23,11 +23,13 @@ import pandas as pd
 
 from .helpers import embed_participants
 
+# Fine-tuned BGE-large model with LoRA (Carter's preference embedding model)
+MODEL_PATH = "embeddings-for-preferences/data/models/best/BAAI_bge_large_en_v1_5/seed42"
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Embed Remesh participants and save for reuse")
     parser.add_argument("data_path", help="Path to Remesh verbatim_map CSV")
-    parser.add_argument("model", help="Carter's embedding model path or HuggingFace name")
     parser.add_argument("--output-dir", default="output", help="Directory to save outputs (default: output/)")
     parser.add_argument("--device", default=None, help="Torch device, e.g. cuda or mps")
     args = parser.parse_args()
@@ -35,7 +37,7 @@ def main() -> None:
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    participant_ids, embeddings = embed_participants(args.data_path, args.model, device=args.device)
+    participant_ids, embeddings = embed_participants(args.data_path, MODEL_PATH, device=args.device)
 
     topic = Path(args.data_path).stem.replace("_verbatim_map", "")
     embeddings_path = output_dir / f"{topic}_embeddings.npy"

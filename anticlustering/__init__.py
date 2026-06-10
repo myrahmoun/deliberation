@@ -7,6 +7,7 @@ from .helpers import (
     group_quality,
     total_quality,
     optimal_dispersion,
+    summarize,
     visualize,
 )
 
@@ -19,5 +20,6 @@ __all__ = [
     "group_quality",
     "total_quality",
     "optimal_dispersion",
+    "summarize",
     "visualize",
 ]

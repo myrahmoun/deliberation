@@ -167,6 +167,68 @@ def optimal_dispersion(a: float, b: float) -> float:
     return -b / (2 * a)
 
 
+# ── Summary ───────────────────────────────────────────────────────────────────
+
+def summarize(
+    assignments: pd.DataFrame,
+    embeddings: np.ndarray,
+    a: float = -1.0,
+    b: float = 2.0,
+    c: float = 0.0,
+    output_path: str | Path | None = None,
+) -> pd.DataFrame:
+    """Print a results summary and return a per-group stats DataFrame.
+
+    Columns: group, n_participants, dispersion, quality, dist_from_optimal.
+
+    Args:
+        assignments: DataFrame with 'Participant ID' and 'group' columns.
+        embeddings: (n, d) array aligned with assignments rows.
+        a, b, c: Quality function parameters.
+        output_path: If given, save the per-group stats CSV here.
+
+    Returns:
+        Per-group stats DataFrame.
+    """
+    groups = sorted(assignments["group"].unique())
+    group_members = [np.where(assignments["group"].values == g)[0] for g in groups]
+    dispersions = all_group_dispersions(embeddings, group_members)
+    qualities = a * dispersions**2 + b * dispersions + c
+    d_opt = optimal_dispersion(a, b)
+
+    stats = pd.DataFrame({
+        "group": groups,
+        "n_participants": [len(m) for m in group_members],
+        "dispersion": dispersions.round(4),
+        "quality": qualities.round(4),
+        "dist_from_optimal": np.abs(dispersions - d_opt).round(4),
+    })
+
+    n_participants = len(assignments)
+    n_groups = len(groups)
+    sizes = stats["n_participants"]
+
+    print("=" * 50)
+    print(f"  Participants : {n_participants}")
+    print(f"  Groups       : {n_groups}  (size {sizes.min()}–{sizes.max()})")
+    print(f"  Optimal D    : {d_opt:.4f}")
+    print(f"  Mean D       : {dispersions.mean():.4f}  (±{dispersions.std():.4f})")
+    print(f"  Mean quality : {qualities.mean():.4f}  (±{qualities.std():.4f})")
+    best_i = int(stats["quality"].argmax())
+    worst_i = int(stats["quality"].argmin())
+    print(f"  Best group   : {stats['group'].iloc[best_i]}  "
+          f"(quality {stats['quality'].iloc[best_i]:.4f})")
+    print(f"  Worst group  : {stats['group'].iloc[worst_i]}  "
+          f"(quality {stats['quality'].iloc[worst_i]:.4f})")
+    print("=" * 50)
+
+    if output_path is not None:
+        stats.to_csv(output_path, index=False)
+        print(f"Saved group stats to {output_path}")
+
+    return stats
+
+
 # ── Visualize ─────────────────────────────────────────────────────────────────
 
 def plot_quality_fn(

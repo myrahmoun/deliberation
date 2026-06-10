@@ -20,6 +20,7 @@ from .helpers import (
     embed_participants,
     load_precomputed_embeddings,
     make_quality_fn,
+    summarize,
     visualize,
 )
 
@@ -44,7 +45,7 @@ PRECOMPUTED_IDS        = "output/campus_protests_participant_ids.csv"
 
 OUTPUT_PATH = "output/campus_protests_assignments.csv"
 
-VISUALIZE = True                               # set False to skip plotting
+VISUALIZE = False                                     # set False to skip plotting
 VISUALIZE_OUTPUT = "output/campus_protests_plot.png"  # set None to show interactively
 
 # ── RUN ───────────────────────────────────────────────────────────────────────
@@ -80,6 +81,9 @@ if __name__ == "__main__":
     results = pd.DataFrame({"Participant ID": participant_ids, "group": assignments})
     results.to_csv(OUTPUT_PATH, index=False)
     print(f"Saved assignments to {OUTPUT_PATH}")
+
+    # Summarize
+    summarize(results, embeddings, a=QUALITY_A, b=QUALITY_B, c=QUALITY_C)
 
     # Visualize
     if VISUALIZE:

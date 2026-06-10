@@ -9,13 +9,13 @@ from .algorithm import form_groups
 from .helpers import make_quality_fn, total_quality, optimal_dispersion, all_group_dispersions
 
 
-DEFAULT_SIZES = [500, 1000, 2000, 5000, 10_000]
+DEFAULT_SIZES = [500, 1000, 2000, 5000, 10000]
 
 
 def run_benchmark(
     sizes: list[int] = DEFAULT_SIZES,
     group_size: int = 8,
-    embedding_dim: int = 384,
+    embedding_dim: int = 1024,
     a: float = -1.0,
     b: float = 2.0,
     c: float = 0.0,
