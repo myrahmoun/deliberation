@@ -296,7 +296,6 @@ def plot_umap(embeddings: np.ndarray, assignments: pd.DataFrame, ax) -> None:
     groups = assignments["group"].values
     n_groups = len(np.unique(groups))
 
-    import matplotlib.pyplot as plt
     cmap = plt.get_cmap("tab20" if n_groups <= 20 else "hsv")
     colors = [cmap(g / n_groups) for g in groups]
     ax.scatter(coords[:, 0], coords[:, 1], c=colors, s=18, alpha=0.7, linewidths=0)
