@@ -4,7 +4,7 @@ Group formation and recommendation tools for [Frankly](https://app.frankly.org),
 
 ## What's here
 
-**`anticlustering/`** — forms groups of 8 from ~10k participants by maximizing viewpoint diversity. Uses a pairwise exchange algorithm with a quadratic quality function `a·D² + b·D + c` over embedding-space dispersion.
+**`anticlustering/`** — forms groups of 8 from ~10k participants by maximizing viewpoint diversity. Uses a pairwise exchange algorithm (stochastic hill-climbing) with a quadratic quality function `a·D² + b·D + c` over embedding-space dispersion.
 
 **`embeddings-for-preferences/`** — Carter's embedding pipeline (fine-tuned BGE-large with LoRA). Submodule; used by `embed.py` to produce participant embeddings.
 
