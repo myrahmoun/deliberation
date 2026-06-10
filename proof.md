@@ -139,12 +139,12 @@ $$
 Q(P') - Q(P) = \frac{1}{K}\bigl[q(D(G_{g_1}')) + q(D(G_{g_2}')) - q(D(G_{g_1})) - q(D(G_{g_2}))\bigr].
 $$
 
-By the cache-consistency corollary, `dispersions[g1]` $= D(G_{g_1})$ and
-`dispersions[g2]` $= D(G_{g_2})$; by Lemma 3, `new_d1` $= D(G_{g_1}')$ and
-`new_d2` $= D(G_{g_2}')$. Substituting into the code's expression gives exactly
+By the cache-consistency corollary, `dispersions[g1]` equals $D(G_{g_1})$ and
+`dispersions[g2]` equals $D(G_{g_2})$; by Lemma 3, `new_d1` equals $D(G_{g_1}')$ and
+`new_d2` equals $D(G_{g_2}')$. Substituting into the code's expression gives exactly
 the bracketed term, i.e. $K\,(Q(P') - Q(P))$. $\qquad\blacksquare$
 
-Since $K > 0$, the test `delta_q > 0` ([`algorithm.py:89`](algorithm.py#L89)) is
+Since $K > 0$, the test $\Delta Q > 0$ ([`algorithm.py:89`](algorithm.py#L89)) is
 **equivalent** to $Q(P') > Q(P)$. The algorithm accepts a swap **iff** it
 strictly increases the true mean-quality objective.
 
