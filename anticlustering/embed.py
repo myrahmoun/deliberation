@@ -2,7 +2,7 @@
 
 Run once per dataset:
 
-    python -m anticlustering.embed data/anticlustering/topic_verbatim_map.csv --output-dir output/
+    python3 -m anticlustering.embed data/anticlustering/topic_verbatim_map.csv --output-dir output/
 
 Produces (named after the CSV stem):
     output/topic_embeddings.npy      — (n, d) float32 participant embeddings

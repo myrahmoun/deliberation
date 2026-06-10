@@ -4,41 +4,36 @@ Group formation and recommendation tools for [Frankly](https://app.frankly.org),
 
 ## What's here
 
-**`anticlustering/`** — forms groups of 8 from ~10k participants by maximizing viewpoint diversity. Uses a pairwise exchange algorithm with a quadratic quality function `a·D² + b·D + c` over embedding-space dispersion. See `anticlustering.md` for the full design.
+**`anticlustering/`** — forms groups of 8 from ~10k participants by maximizing viewpoint diversity. Uses a pairwise exchange algorithm with a quadratic quality function `a·D² + b·D + c` over embedding-space dispersion.
 
-**`src/`** — Carter's embedding pipeline (fine-tuned BGE model with LoRA), evaluation harness, and opinion generation utilities.
+**`embeddings-for-preferences/`** — Carter's embedding pipeline (fine-tuned BGE-large with LoRA). Submodule; used by `embed.py` to produce participant embeddings.
 
 ## Quickstart
 
 ### 1. Embed participants (once per dataset)
 
-Embedding is slow — run this once and reuse the output:
-
 ```bash
-python -m anticlustering.embed data/remesh_export.csv path/to/model --output-dir output/
+python -m anticlustering.embed data/remesh_export.csv --output-dir output/
 ```
 
-Saves `output/embeddings.npy` and `output/participant_ids.csv`.
+The model is set at the top of `embed.py` (`MODEL_PATH`). Saves `output/<topic>_embeddings.npy` and `output/<topic>_participant_ids.csv`.
 
 ### 2. Configure and run
 
 Edit the `CONFIG` block at the top of `anticlustering/main.py`:
 
 ```python
-DATA_PATH    = "data/remesh_export.csv"
-MODEL_PATH   = "path/to/model"
-GROUP_SIZE   = 8
-VISUALIZE    = True   # set False to skip plots
-
-# Point to pre-computed embeddings to skip re-embedding:
-PRECOMPUTED_EMBEDDINGS = "output/campus_protests_embeddings.npy"
-PRECOMPUTED_IDS        = "output/s/campus_protests_participant_ids.csv"
+DATA_PATH              = "data/remesh_export.csv"
+PRECOMPUTED_EMBEDDINGS = "output/topic_embeddings.npy"
+PRECOMPUTED_IDS        = "output/topic_participant_ids.csv"
+GROUP_SIZE             = 8
+VISUALIZE              = True
 ```
 
-Then run:
+Then:
 
 ```bash
-python3 -m anticlustering.main
+python -m anticlustering.main
 ```
 
 Saves group assignments to `output/assignments.csv`.
@@ -46,10 +41,10 @@ Saves group assignments to `output/assignments.csv`.
 ### 3. Benchmark
 
 ```bash
-python3 -m anticlustering.benchmark
+python -m anticlustering.benchmark
 ```
 
-Runs on synthetic data across several sizes — should hit 10k participants in ≤30s.
+Runs on synthetic data across several sizes — should complete 10k participants in ≤30s.
 
 ## File structure
 
@@ -57,26 +52,26 @@ Runs on synthetic data across several sizes — should hit 10k participants in �
 anticlustering/
   main.py       — config + orchestration (start here)
   algorithm.py  — form_groups(): pairwise exchange anti-clustering
-  helpers.py    — utilities grouped by role: load data, embedding,
-                  dispersion, quality, visualize
+  helpers.py    — load data, embed, dispersion, quality, visualize
   embed.py      — one-time script to pre-compute and save embeddings
   benchmark.py  — runtime scaling benchmark on synthetic data
+  proof.md      — correctness proof for the algorithm
 ```
 
-## Swapping the algorithm or objective
+## Extending
 
 To change the **quality objective**, pass a different `quality_fn` in `main.py`:
 
 ```python
-# e.g. maximize raw dispersion instead of quadratic
 form_groups(embeddings, group_size=8, quality_fn=lambda d: d)
 ```
 
-To change the **algorithm** entirely, replace the `form_groups` call in `main.py` with any function that accepts `(embeddings, group_size, ...)` and returns an `(n,)` int array of group indices.
+To swap the **algorithm** entirely, replace `form_groups` with any function taking `(embeddings, group_size, ...)` and returning an `(n,)` int array of group indices.
 
 ## Dependencies
 
 Install from `environment.yml` (conda) or `pyproject.toml` (pip).
 
-## Link to Remesh data
-https://github.com/akonya/polarized-issues-data
+## Data
+
+Remesh export CSVs: https://github.com/akonya/polarized-issues-data
