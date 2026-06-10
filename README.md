@@ -1,4 +1,4 @@
-# deliberation
+# Deliberation Experiments
 
 Group formation and recommendation tools for [Frankly](https://app.frankly.org), a large-scale deliberation platform.
 
